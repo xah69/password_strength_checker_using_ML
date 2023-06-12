@@ -1,5 +1,35 @@
-import pickle
+import pandas as pd
+import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
 import getpass
+import pickle
+#take raw data
+def input_data(fname,limit):
+    ini_data = pd.read_csv(fname, error_bad_lines=False)
+    data = ini_data.head(limit)
+    return data
+
+#print few data
+def print_data(data,limit):
+    data.head(limit)
+
+#clean the null values
+def clean_null(data):
+    data = data.dropna()
+    return data
+
+#training input
+def X(data_column):
+    X = np.array(data_column)
+    return X
+
+#the validator (Label)
+def Y(data_column):
+    Y = np.array(data_column)
+    return Y
 
 #tokenizer
 def word(password):
@@ -8,15 +38,39 @@ def word(password):
         character.append(i)
     return character
 
-# Load the model from the file
-with open('model.pkl', 'rb') as file:
-    model = pickle.load(file)
 
-# Load the model from the file
-with open('tdif.pkl', 'rb') as file:
-    tdif = pickle.load(file)
 
-#"""
+data = input_data("data.csv",10000)
+print_data(data,10)
+clean_null(data)
+
+#assign meaning to number
+data["strength"] = data["strength"].map({0: "Weak", 
+                                         1: "Medium",
+                                         2: "Strong"})
+
+x = X(data["password"])
+y = Y(data["strength"])
+
+#train 
+tdif = TfidfVectorizer(tokenizer=word)
+x = tdif.fit_transform(x)
+
+xtrain, xtest, ytrain, ytest = train_test_split(x, y, 
+                                                test_size=0.5, 
+                                                random_state=42)
+model = RandomForestClassifier()
+model.fit(xtrain, ytrain)
+print(model.score(xtest, ytest))
+
+# Save the model to a file
+with open('model.pkl', 'wb') as file:
+    pickle.dump(model, file)
+
+# Save the tdif to a file
+with open('tdif.pkl', 'wb') as file:
+    pickle.dump(tdif, file)
+
 #test_interface
 while True:
     user = getpass.getpass("Enter Password: ")
@@ -25,4 +79,115 @@ while True:
     data = tdif.transform([user]).toarray()
     output = model.predict(data)
     print(output)
-#"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
